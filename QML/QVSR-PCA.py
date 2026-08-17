@@ -1,9 +1,9 @@
 from sklearn.datasets import fetch_california_housing
-import numpy as np
+from sklearn.datasets import load_diabetes
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-
+import numpy as np
 from classiq import *
 from classiq.applications.qsvm.qsvm import QSVM, QuantumKernelEvaluator
 from classiq.applications.qsvm.quantum_feature_maps import pauli_feature_map
@@ -11,17 +11,25 @@ from classiq.open_library.functions.variational import inplace_encode_on_bloch
 from sklearn.svm import SVR
 import random
 from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
+
+#for some reason, sklearn is not installed in the classiq environment, so we have to install it manually
 
 data = fetch_california_housing(as_frame=True)
+data2 = load_diabetes(as_frame=True)
+
 X = data.data
 X_std = (X - X.mean()) / X.std()#Standardization / dont understant what its doing
 
+
+X2 = data2.data
+X_std2 = (X2 - X2.mean()) / X2.std()
 
 
 
 # ML TIME
 y = data.target
-
+y2 = data2.target
 def QSVR_PCA(model, target, k):
     X_train, X_test, y_train, y_test = train_test_split(model, target, test_size=0.2, random_state=0) #split
 
@@ -79,18 +87,54 @@ def QSVR_PCA(model, target, k):
     print("K_train std :", K_train.std())
     print("K_train min :", K_train.min(), "max:", K_train.max())
 
-    return mean_squared_error(y_test, preds)
+    return mean_squared_error(y_test, preds), r2_score(y_test, preds)
 
 mse= []
 components = []
-
+R = []
 for g in range(2, 9):
     print("PCA with", g, "components")
-    mse.append(QSVR_PCA(X_std, y, g))
+    l = QSVR_PCA(X_std, y, g)
+    R.append(l[1])
+    mse.append(l[0])
     components.append(g)
 
+plt.figure()
 plt.plot( components,mse, marker='o')
 plt.title("QSVR with PCA")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
 plt.savefig("qsvr_pca_sweep.png")
+
+
+plt.figure()
+plt.plot( components,R, marker='o')
+plt.title("QSVR PCA R^2 score")
+plt.xlabel("Number of PCA components")
+plt.ylabel("R^2 score")
+plt.savefig("qsvr_pca_R2.png")
+
+mse2= []
+components2 = []
+R2= []
+print("cali:", X_std.shape, " diabetes:", X_std2.shape)
+
+for e in range(2, 11):
+    print("PCA with", e, "components")
+    l = QSVR_PCA(X_std2, y2, e)
+    mse2.append(l[0])
+    R2.append(l[1])
+    components2.append(e)
+plt.figure()
+plt.plot( components2,mse2, marker='o')
+plt.title("QSVR with PCA for diabetes dataset")
+plt.xlabel("Number of PCA components")
+plt.ylabel("Mean Squared Error")
+plt.savefig("qsvr_pca_sweep_D.png")
+
+plt.figure()
+plt.plot( components,R2, marker='o')
+plt.title("QSVR PCA R^2 score")
+plt.xlabel("Number of PCA components")
+plt.ylabel("R^2 score")
+plt.savefig("qsvr_pca_R2_D.png")
