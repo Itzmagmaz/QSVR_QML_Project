@@ -68,3 +68,44 @@ plt.ylabel("PC2 (23.5%)")
 plt.title("California Housing — PCA to 2D")
 plt.show()
 
+#PCA MSE thing
+losses = []
+for g in range(2,9):
+    X_g = X_std.values @ eigenvectors_sorted[:, :g]   # keep first g components
+    X_train, X_test, y_train, y_test = train_test_split(X_g, y, test_size=0.2, random_state=0) #split
+
+    X_train_t = torch.tensor(X_train, dtype=torch.float32)
+    X_test_t  = torch.tensor(X_test, dtype=torch.float32)
+    y_train_t = torch.tensor(y_train.values, dtype=torch.float32)
+    y_test_t  = torch.tensor(y_test.values, dtype=torch.float32)
+
+    y_train_t = y_train_t.reshape(-1, 1)
+    y_test_t  = y_test_t.reshape(-1, 1)
+
+    model = nn.Sequential(
+        nn.Linear(g, 16),
+        nn.ReLU(),
+        nn.Linear(16, 1)
+    )
+    loss_fn = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+
+    for epoch in range(2000):
+        preds = model(X_train_t)
+        loss = loss_fn(preds, y_train_t)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        if epoch % 100 == 0:
+            print(epoch, losses.append(loss.item()))
+
+    with torch.no_grad():
+        test_preds = model(X_test_t)
+        test_loss = loss_fn(test_preds, y_test_t)
+        print(test_loss.item())
+
+plt.figure()
+plt.plot(range(2,9), losses, marker='o')
+plt.title("MSE vs PCA components")
+plt.xlabel("Number of PCA components")
+plt.ylabel("Mean Squared Error")

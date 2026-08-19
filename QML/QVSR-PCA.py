@@ -64,7 +64,7 @@ def QSVR_PCA(model, target, k):
     N_DIM = X_train.shape[1]                 # 8 features -> 8 qubits
     PAULIS = [[Pauli.Z], [Pauli.Z, Pauli.Z]] # single-qubit Z rotations + two-qubit ZZ rotations
     AFFINES = [[1, 0], [1, np.pi]]           # how data values map into rotation angles
-    CONNECTIVITY = 2                         # which qubit pairs get entangled (2 = full: all pairs)
+    CONNECTIVITY = 2                          # which qubit pairs get entangled (2 = full: all pairs)
     REPS = 2                                 # how many times to repeat the encoding block
 
     feature_map = lambda data, qba: pauli_feature_map(  #still dont understand lambda fucntions
@@ -88,7 +88,7 @@ def QSVR_PCA(model, target, k):
     print("K_train min :", K_train.min(), "max:", K_train.max())
 
     return mean_squared_error(y_test, preds), r2_score(y_test, preds)
-
+'''
 mse= []
 components = []
 R = []
@@ -113,7 +113,7 @@ plt.title("QSVR PCA R^2 score")
 plt.xlabel("Number of PCA components")
 plt.ylabel("R^2 score")
 plt.savefig("qsvr_pca_R2.png")
-
+'''
 mse2= []
 components2 = []
 R2= []
@@ -133,7 +133,7 @@ plt.ylabel("Mean Squared Error")
 plt.savefig("qsvr_pca_sweep_D.png")
 
 plt.figure()
-plt.plot( components,R2, marker='o')
+plt.plot( components2,R2, marker='o')
 plt.title("QSVR PCA R^2 score")
 plt.xlabel("Number of PCA components")
 plt.ylabel("R^2 score")
