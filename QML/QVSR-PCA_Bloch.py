@@ -7,7 +7,7 @@ import numpy as np
 from classiq import *
 from classiq.applications.qsvm.qsvm import QSVM, QuantumKernelEvaluator
 from classiq.applications.qsvm.quantum_feature_maps import pauli_feature_map
-from classiq.open_library.functions.variational import inplace_encode_on_bloch
+from classiq.open_library.functions.variational import encode_on_bloch
 from sklearn.svm import SVR
 import random
 from sklearn.metrics import mean_squared_error
@@ -44,6 +44,10 @@ def QSVR_PCA(model, target, k):
     cov = np.cov(X_train.T) #Covariance matrix of the standardized data/ How data moves together
     #what does .T mean? (Transpose) 
 
+    
+    explained = eigenvalues / eigenvalues.sum()
+
+
     eigenvalues, eigenvectors = np.linalg.eigh(cov) #Eigen decomposition of the covariance matrix
 
     vecs = eigenvectors[:, ::-1] #orders strongest first, weakest last
@@ -72,7 +76,7 @@ def QSVR_PCA(model, target, k):
     )
 
     N_DIM = X_train.shape[1]
-    kernel = QuantumKernelEvaluator(feature_map=feature_map, num_qubits=N_DIM)
+    kernel = QuantumKernelEvaluator(feature_map=feature_map, num_qubits=N_DIM // 2)
 
     K_train = kernel.kernel(X_train)            # (60, 60) — train vs train
     K_test  = kernel.kernel(X_test, X_train)    # (20, 60) — test vs train

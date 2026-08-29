@@ -97,11 +97,12 @@ for g in range(2,9):
         loss.backward()
         optimizer.step()
         if epoch % 100 == 0:
-            print(epoch, losses.append(loss.item()))
+            print(epoch, loss.item())
 
     with torch.no_grad():
         test_preds = model(X_test_t)
         test_loss = loss_fn(test_preds, y_test_t)
+        losses.append(test_loss.item())
         print(test_loss.item())
 
 plt.figure()
@@ -109,3 +110,4 @@ plt.plot(range(2,9), losses, marker='o')
 plt.title("MSE vs PCA components")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
+plt.savefig("ML_PCA_MSE.png")
