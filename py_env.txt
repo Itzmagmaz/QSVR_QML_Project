@@ -1,0 +1,4 @@
+PYTHON=/home/openvscode-server/classiq-venv/bin/python3
+PYTHONPATH=/classiq-venv/
+PIP_TARGET=/classiq-venv/
+VIRTUAL_ENV=/home/openvscode-server/classiq-venv
