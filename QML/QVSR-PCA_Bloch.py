@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
+from sklearn.svm import SVR
 from classiq import *
 from classiq.applications.qsvm.qsvm import QSVM, QuantumKernelEvaluator
-from classiq.applications.qsvm.quantum_feature_maps import pauli_feature_map
 from classiq.open_library.functions.variational import encode_on_bloch
-from sklearn.svm import SVR
+from classiq.open_library.functions.variational import inplace_encode_on_bloch
 import random
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
@@ -26,13 +26,15 @@ X2 = data2.data
 X_std2 = (X2 - X2.mean()) / X2.std()
 
 
+
+
 @qfunc
-def Map(gatecount: CInt, data: CArray[CReal, gatecount], x: Output[QArray[QBit]]): #gatecount should be entered as a parameter
-    encode_on_bloch(data, x)
+def Map(data: CArray[CReal], x: QArray[QBit]):
+    inplace_encode_on_bloch(data, x)
 # ML TIME
 y = data.target
 y2 = data2.target
-def QSVR_PCA(model, target, k):
+def QSVR_PCA(model, target,k ):
     X_train, X_test, y_train, y_test = train_test_split(model, target, test_size=0.2, random_state=0) #split
 
 
@@ -44,13 +46,12 @@ def QSVR_PCA(model, target, k):
 
 
     cov = np.cov(X_train.T) #Covariance matrix of the standardized data/ How data moves together
-    #what does .T mean? (Transpose) 
-
-    
-    explained = eigenvalues / eigenvalues.sum()
+    #what does .T mean? (Transpose)
 
 
     eigenvalues, eigenvectors = np.linalg.eigh(cov) #Eigen decomposition of the covariance matrix
+
+    explained = eigenvalues / eigenvalues.sum()
 
     vecs = eigenvectors[:, ::-1] #orders strongest first, weakest last
 
@@ -63,14 +64,25 @@ def QSVR_PCA(model, target, k):
     X_train = scaler.fit_transform(X_train)   # learn min/max FROM TRAIN, then scale
     X_test  = scaler.transform(X_test)        # apply TRAIN's min/max to test
 
+    PCA_weights = []
+
+    for i in range(X_train.shape[1]):
+        PCA_weights.append(2 ** (X_train.shape[1] - i - 1))
+
+    X_train =np.repeat(X_train, PCA_weights, axis=1)
+    X_test =np.repeat(X_test, PCA_weights, axis=1)
+
+    X_train = np.pad(X_train, ((0,0),(0,1))) #DO NOT REMOVE THIS LINE, IT IS NECESSARY FOR THE QSVR TO WORK, OTHERWISE IT WILL THROW AN ERROR
+    X_test  = np.pad(X_test, ((0,0),(0,1)))
+
     #mini split due to hardware limitations
     X_train, y_train = X_train[:60], y_train[:60]
     X_test,  y_test  = X_test[:20],  y_test[:20]
 
-    feature_map = Map(k*2)
-
+    feature_map = Map
     N_DIM = X_train.shape[1]
-    kernel = QuantumKernelEvaluator(feature_map=feature_map, num_qubits=N_DIM // 2)
+    
+    kernel = QuantumKernelEvaluator(feature_map=feature_map, num_qubits= X_train.shape[1] // 2)
 
     K_train = kernel.kernel(X_train)            # (60, 60) — train vs train
     K_test  = kernel.kernel(X_test, X_train)    # (20, 60) — test vs train
@@ -90,7 +102,7 @@ def QSVR_PCA(model, target, k):
 mse= []
 components = []
 R = []
-for g in range(2, 9):
+for g in range(2, 6):
     print("PCA with", g, "components")
     l = QSVR_PCA(X_std, y, g)
     R.append(l[1])
@@ -102,37 +114,5 @@ plt.plot( components,mse, marker='o')
 plt.title("QSVR with PCA")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
-plt.savefig("qsvr_pca_sweep.png")
+plt.savefig("qsvr_pca_sweep_bloch.png")
 
-
-plt.figure()
-plt.plot( components,R, marker='o')
-plt.title("QSVR PCA R^2 score")
-plt.xlabel("Number of PCA components")
-plt.ylabel("R^2 score")
-plt.savefig("qsvr_pca_R2.png")
-
-mse2= []
-components2 = []
-R2= []
-print("cali:", X_std.shape, " diabetes:", X_std2.shape)
-
-for e in range(2, 11):
-    print("PCA with", e, "components")
-    l = QSVR_PCA(X_std2, y2, e)
-    mse2.append(l[0])
-    R2.append(l[1])
-    components2.append(e)
-plt.figure()
-plt.plot( components2,mse2, marker='o')
-plt.title("QSVR with PCA for diabetes dataset")
-plt.xlabel("Number of PCA components")
-plt.ylabel("Mean Squared Error")
-plt.savefig("qsvr_pca_sweep_D.png")
-
-plt.figure()
-plt.plot( components,R2, marker='o')
-plt.title("QSVR PCA R^2 score")
-plt.xlabel("Number of PCA components")
-plt.ylabel("R^2 score")
-plt.savefig("qsvr_pca_R2_D.png")
