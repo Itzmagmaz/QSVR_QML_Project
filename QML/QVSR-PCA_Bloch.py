@@ -26,7 +26,9 @@ X2 = data2.data
 X_std2 = (X2 - X2.mean()) / X2.std()
 
 
-
+@qfunc
+def Map(gatecount: CInt, data: CArray[CReal, gatecount], x: Output[QArray[QBit]]): #gatecount should be entered as a parameter
+    encode_on_bloch(data, x)
 # ML TIME
 y = data.target
 y2 = data2.target
@@ -65,15 +67,7 @@ def QSVR_PCA(model, target, k):
     X_train, y_train = X_train[:60], y_train[:60]
     X_test,  y_test  = X_test[:20],  y_test[:20]
 
-    N_DIM = X_train.shape[1]                 # 8 features -> 8 qubits
-    PAULIS = [[Pauli.Z], [Pauli.Z, Pauli.Z]] # single-qubit Z rotations + two-qubit ZZ rotations
-    AFFINES = [[1, 0], [1, np.pi]]           # how data values map into rotation angles
-    CONNECTIVITY = 2                         # which qubit pairs get entangled (2 = full: all pairs)
-    REPS = 2                                 # how many times to repeat the encoding block
-
-    feature_map = lambda data, qba: encode_on_bloch(  #still dont understand lambda fucntions
-        data, PAULIS, AFFINES, CONNECTIVITY, REPS, qba
-    )
+    feature_map = Map(k*2)
 
     N_DIM = X_train.shape[1]
     kernel = QuantumKernelEvaluator(feature_map=feature_map, num_qubits=N_DIM // 2)
