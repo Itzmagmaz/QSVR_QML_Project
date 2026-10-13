@@ -1,9 +1,14 @@
 from sklearn.datasets import fetch_california_housing
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
 from sklearn.model_selection import train_test_split
 import torch
 import torch.nn as nn
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+IMAGES_DIR = PROJECT_ROOT / "Images"
+IMAGES_DIR.mkdir(exist_ok=True)
 
 data = fetch_california_housing(as_frame=True)
 X = data.data
@@ -110,4 +115,4 @@ plt.plot(range(2,9), losses, marker='o')
 plt.title("MSE vs PCA components")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
-plt.savefig("ML_PCA_MSE.png")
+plt.savefig(IMAGES_DIR / "ML_PCA_MSE.png")

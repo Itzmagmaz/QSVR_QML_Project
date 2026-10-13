@@ -1,6 +1,7 @@
 from sklearn.datasets import fetch_california_housing
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
 from sklearn.model_selection import train_test_split
 
 
@@ -25,5 +26,5 @@ for i in range(1000):
     dataset[i]= datapoint.reshape(1, 9) #append the new datapoint to the dataset
 
 
-np.save("synthetic_dataset.npy", dataset)
+np.save(Path(__file__).resolve().with_name("synthetic_dataset.npy"), dataset)
 print("Synthetic dataset saved as synthetic_dataset.npy")

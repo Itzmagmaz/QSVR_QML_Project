@@ -1,6 +1,7 @@
 from sklearn.datasets import fetch_california_housing
 from sklearn.datasets import load_diabetes
 import matplotlib.pyplot as plt
+from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
@@ -14,6 +15,10 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
 #for some reason, sklearn is not installed in the classiq environment, so we have to install it manually
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+IMAGES_DIR = PROJECT_ROOT / "Images"
+IMAGES_DIR.mkdir(exist_ok=True)
 
 data = fetch_california_housing(as_frame=True)
 data2 = load_diabetes(as_frame=True)
@@ -104,7 +109,7 @@ plt.plot( components,mse, marker='o')
 plt.title("QSVR with PCA")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
-plt.savefig("qsvr_pca_sweep.png")
+plt.savefig(IMAGES_DIR / "qsvr_pca_sweep.png")
 
 
 plt.figure()
@@ -112,7 +117,7 @@ plt.plot( components,R, marker='o')
 plt.title("QSVR PCA R^2 score")
 plt.xlabel("Number of PCA components")
 plt.ylabel("R^2 score")
-plt.savefig("qsvr_pca_R2.png")
+plt.savefig(IMAGES_DIR / "qsvr_pca_R2.png")
 '''
 mse2= []
 components2 = []
@@ -130,11 +135,11 @@ plt.plot( components2,mse2, marker='o')
 plt.title("QSVR with PCA for diabetes dataset")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
-plt.savefig("qsvr_pca_sweep_D.png")
+plt.savefig(IMAGES_DIR / "qsvr_pca_sweep_D.png")
 
 plt.figure()
 plt.plot( components2,R2, marker='o')
 plt.title("QSVR PCA R^2 score")
 plt.xlabel("Number of PCA components")
 plt.ylabel("R^2 score")
-plt.savefig("qsvr_pca_R2_D.png")
+plt.savefig(IMAGES_DIR / "qsvr_pca_R2_D.png")
