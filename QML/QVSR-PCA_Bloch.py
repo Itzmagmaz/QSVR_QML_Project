@@ -12,6 +12,10 @@ from classiq.open_library.functions.variational import inplace_encode_on_bloch
 import random
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
+from pathlib import Path
+
+IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images"
+IMAGES_DIR.mkdir(exist_ok=True)
 
 #for some reason, sklearn is not installed in the classiq environment, so we have to install it manually
 
@@ -114,5 +118,5 @@ plt.plot( components,mse, marker='o')
 plt.title("QSVR with PCA")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
-plt.savefig("qsvr_pca_sweep_bloch.png")
+plt.savefig(IMAGES_DIR / "qsvr_pca_sweep_bloch.png")
 

@@ -14,6 +14,9 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from pathlib import Path
 
+IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images"
+IMAGES_DIR.mkdir(exist_ok=True)
+
 data_path = Path(__file__).resolve().parent.parent / "ML" / "synthetic_dataset.npy"
 data = np.load(data_path)
 #for some reason, sklearn is not installed in the classiq environment, so we have to install it manually
@@ -105,6 +108,6 @@ plt.plot( components,mse, marker='o')
 plt.title("QSVR with PCA")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
-plt.savefig("qsvr_pca_sweep_SynthZ.png")
+plt.savefig(IMAGES_DIR / "qsvr_pca_sweep_SynthZ.png")
 
 

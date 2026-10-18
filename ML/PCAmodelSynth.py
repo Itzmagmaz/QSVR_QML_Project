@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 import torch
 import torch.nn as nn
+from pathlib import Path
+
+IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images"
+IMAGES_DIR.mkdir(exist_ok=True)
 
 data = np.load("synthetic_dataset.npy")
 X = data
@@ -110,4 +114,4 @@ plt.plot(range(2,10), losses, marker='o')
 plt.title("MSE vs PCA components")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
-plt.savefig("ML_SYNTH_PCA_MSE.png")
+plt.savefig(IMAGES_DIR / "ML_SYNTH_PCA_MSE.png")

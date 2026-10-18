@@ -12,6 +12,10 @@ from sklearn.svm import SVR
 import random
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
+from pathlib import Path
+
+IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images"
+IMAGES_DIR.mkdir(exist_ok=True)
 
 #for some reason, sklearn is not installed in the classiq environment, so we have to install it manually
 
@@ -104,7 +108,7 @@ plt.plot( components,mse, marker='o')
 plt.title("QSVR with PCA")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
-plt.savefig("qsvr_pca_sweep.png")
+plt.savefig(IMAGES_DIR / "qsvr_pca_sweep.png")
 
 
 plt.figure()
@@ -112,7 +116,7 @@ plt.plot( components,R, marker='o')
 plt.title("QSVR PCA R^2 score")
 plt.xlabel("Number of PCA components")
 plt.ylabel("R^2 score")
-plt.savefig("qsvr_pca_R2.png")
+plt.savefig(IMAGES_DIR / "qsvr_pca_R2.png")
 '''
 mse2= []
 components2 = []
@@ -130,11 +134,11 @@ plt.plot( components2,mse2, marker='o')
 plt.title("QSVR with PCA for diabetes dataset")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
-plt.savefig("qsvr_pca_sweep_D.png")
+plt.savefig(IMAGES_DIR / "qsvr_pca_sweep_D.png")
 
 plt.figure()
 plt.plot( components2,R2, marker='o')
 plt.title("QSVR PCA R^2 score")
 plt.xlabel("Number of PCA components")
 plt.ylabel("R^2 score")
-plt.savefig("qsvr_pca_R2_D.png")
+plt.savefig(IMAGES_DIR / "qsvr_pca_R2_D.png")
