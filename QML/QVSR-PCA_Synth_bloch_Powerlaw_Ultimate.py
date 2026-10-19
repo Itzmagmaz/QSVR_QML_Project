@@ -14,7 +14,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from pathlib import Path
 
-np.random.seed(0)  # Set a random seed for reproducibility
+ # Set a random seed for reproducibility
 
 IMAGES_DIR = Path(__file__).resolve().parent.parent / "Powerlaw Images"
 IMAGES_DIR.mkdir(exist_ok=True)
@@ -59,23 +59,20 @@ def QSVR_PCA(model, target,k, qubit_exponent ):
     X_test  = scaler.transform(X_test)        # apply TRAIN's min/max to test
 
     PCA_weights = []
-    powerlaw_exponent = qubit_exponent # controls the decay of the eigenvalues
+    powerlaw_exponent = qubit_exponent
+
     for i in range(X_train.shape[1]):
-        PCA_weights.append(round((X_train.shape[1] / (i + 1)) ** powerlaw_exponent))
+        PCA_weights.append(
+            round((X_train.shape[1] / (i + 1)) ** powerlaw_exponent)
+        )
 
-        total_qubits = (sum(PCA_weights) + 1) // 2
+    total_qubits = (sum(PCA_weights) + 1) // 2
 
-        if total_qubits > 24:
-            print(f"Skipping {g} PCs: requires {total_qubits} qubits")
-            continue
+    if total_qubits > 24:
+        print(f"Skipping {k} PCs: requires {total_qubits} qubits")
+        return None
 
-        print(f"PCA with {g} components, {total_qubits} qubits")
-
-        l = QSVR_PCA(X_std, y, g, qubit_exponent)
-
-    R.append(l[1])
-    mse.append(l[0])
-    components.append(g)
+    print(f"PCA with {k} components, {total_qubits} qubits")
 
     X_train =np.repeat(X_train, PCA_weights, axis=1)
     X_test =np.repeat(X_test, PCA_weights, axis=1)
@@ -110,6 +107,7 @@ def QSVR_PCA(model, target,k, qubit_exponent ):
     return mean_squared_error(y_test, preds), r2_score(y_test, preds)
 
 def GenerateData(exp):
+    np.random.seed(0) 
     num_samples = 1000
     num_features = 8
 
@@ -138,18 +136,22 @@ def Powerlaw_QSVR_PCA(powerlaw_exponent, qubit_exponent):
     R = []
 
     X = GenerateData(powerlaw_exponent)
-    X_std = (X - X.mean(axis=0)) / X.std(axis=0)#Standardization / dont understant what its doing
+    X_std = (X - X.mean()) / X.std()#Standardization / dont understant what its doing
 
     # ML TIME
     y = X_std.sum(axis=1)
 
     for g in range(2, 9):
         print("PCA with", g, "components")
+
         l = QSVR_PCA(X_std, y, g, qubit_exponent)
+
+        if l is None:
+            continue
+
         R.append(l[1])
         mse.append(l[0])
         components.append(g)
-
         
         
 
