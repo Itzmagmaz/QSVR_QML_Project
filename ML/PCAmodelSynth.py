@@ -111,7 +111,7 @@ for g in range(2,10):
 
 plt.figure()
 plt.plot(range(2,10), losses, marker='o')
-plt.title("MSE vs PCA components")
+plt.title("Exponential Decay Synthetic Data: Classical MSE vs PCA components")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
-plt.savefig(IMAGES_DIR / "ML_SYNTH_PCA_MSE.png")
+plt.savefig(IMAGES_DIR / "ML_EXPD_PCA_MSE.png")

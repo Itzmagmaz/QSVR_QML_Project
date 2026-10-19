@@ -92,7 +92,7 @@ def QSVR_PCA(model, target, k):
     print("K_train min :", K_train.min(), "max:", K_train.max())
 
     return mean_squared_error(y_test, preds), r2_score(y_test, preds)
-'''
+
 mse= []
 components = []
 R = []
@@ -141,4 +141,4 @@ plt.plot( components2,R2, marker='o')
 plt.title("QSVR PCA R^2 score")
 plt.xlabel("Number of PCA components")
 plt.ylabel("R^2 score")
-plt.savefig(IMAGES_DIR / "qsvr_pca_R2_D.png")
+plt.savefig(IMAGES_DIR / "qsvr_pca_R2_D.png")'''

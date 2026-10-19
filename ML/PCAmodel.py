@@ -111,7 +111,7 @@ for g in range(2,9):
 
 plt.figure()
 plt.plot(range(2,9), losses, marker='o')
-plt.title("MSE vs PCA components")
+plt.title("Classical MSE vs PCA components")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
 plt.savefig(IMAGES_DIR / "ML_PCA_MSE.png")

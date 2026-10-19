@@ -106,7 +106,7 @@ def QSVR_PCA(model, target,k ):
 mse= []
 components = []
 R = []
-for g in range(2, 6):
+for g in range(2, 9):
     print("PCA with", g, "components")
     l = QSVR_PCA(X_std, y, g)
     R.append(l[1])
@@ -115,8 +115,8 @@ for g in range(2, 6):
 
 plt.figure()
 plt.plot( components,mse, marker='o')
-plt.title("QSVR with PCA")
+plt.title("Bloch encoding with weights : QSVR with PCA")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
-plt.savefig(IMAGES_DIR / "qsvr_pca_sweep_bloch.png")
+plt.savefig(IMAGES_DIR / "qsvr_pca_weights_bloch.png")
 
