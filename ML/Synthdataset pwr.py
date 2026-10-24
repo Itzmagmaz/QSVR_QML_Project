@@ -8,7 +8,7 @@ np.random.seed(0)
 
 eigenvalues_sorted = [.5]#orders strongest first, weakest last
 eigenvectors = [1] #does not do anything currently 
-powerlaw_exponent = 1.5 #controls the decay of the eigenvalues
+powerlaw_exponent = 3 #controls the decay of the eigenvalues
 for i in range(1, 9):
     eigenvalues_sorted.append(.5 / (i + 1) ** powerlaw_exponent)#orders strongest first, weakest last
     eigenvectors.append(1) 
@@ -26,5 +26,5 @@ for i in range(1000):
     dataset[i]= datapoint.reshape(1, 9) #append the new datapoint to the dataset
 
 
-np.save("synthetic_powerlaw_dataset.npy", dataset)
-print("Synthetic dataset saved as synthetic_powerlaw_dataset.npy")
+np.save("synthetic_powerlaw3_dataset.npy", dataset)
+print("Synthetic dataset saved as synthetic_powerlaw3_dataset.npy")

@@ -13,10 +13,10 @@ import random
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from pathlib import Path
-
+import csv
  # Set a random seed for reproducibility
 
-IMAGES_DIR = Path(__file__).resolve().parent.parent / "Powerlaw Images"
+IMAGES_DIR = Path(__file__).resolve().parent.parent / "Powerlaw images"
 IMAGES_DIR.mkdir(exist_ok=True)
 
 #for some reason, sklearn is not installed in the classiq environment, so we have to install it manually
@@ -104,12 +104,12 @@ def QSVR_PCA(model, target,k, qubit_exponent ):
     print("K_train std :", K_train.std())
     print("K_train min :", K_train.min(), "max:", K_train.max())
 
-    return mean_squared_error(y_test, preds), r2_score(y_test, preds)
+    return mean_squared_error(y_test, preds), r2_score(y_test, preds), total_qubits
 
 def GenerateData(exp):
     np.random.seed(0) 
     num_samples = 1000
-    num_features = 8
+    num_features = 9
 
     eigenvalues_sorted = np.array([
         0.5 / k**exp
@@ -118,15 +118,7 @@ def GenerateData(exp):
 
     random_data = np.random.randn(num_samples, num_features)
 
-    # Random orthogonal rotation preserves the intended spectrum
-    random_matrix = np.random.randn(num_features, num_features)
-    Q, _ = np.linalg.qr(random_matrix)
-
-    synthetic_data = (
-        random_data
-        @ np.diag(np.sqrt(eigenvalues_sorted))
-        @ Q.T
-    )
+    synthetic_data = random_data @ np.diag(np.sqrt(eigenvalues_sorted))
 
     return synthetic_data
 
@@ -136,10 +128,11 @@ def Powerlaw_QSVR_PCA(powerlaw_exponent, qubit_exponent):
     R = []
 
     X = GenerateData(powerlaw_exponent)
+    np.random.seed(0)
     X_std = (X - X.mean()) / X.std()#Standardization / dont understant what its doing
 
     # ML TIME
-    y = X_std.sum(axis=1)
+    y = X.sum(axis=1)
 
     for g in range(2, 9):
         print("PCA with", g, "components")
@@ -153,15 +146,40 @@ def Powerlaw_QSVR_PCA(powerlaw_exponent, qubit_exponent):
         mse.append(l[0])
         components.append(g)
         
-        
+        with RESULTS_CSV.open("a", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                "Bloch",
+                powerlaw_exponent,
+                qubit_exponent,
+                g,
+                l[2],
+                l[0],
+                l[1]
+            ])
 
     plt.figure()
     plt.plot( components,mse, marker='o')
-    plt.title(f"powerlaw weights({powerlaw_exponent}) Synthetic data Bloch encoding with weights({qubit_exponent}) : QSVR with PCA")
+    plt.title(f"powerlaw weights({powerlaw_exponent})  No Rotation Synthetic data Bloch encoding with weights({qubit_exponent}) : QSVR with PCA")
     plt.xlabel("Number of PCA components")
     plt.ylabel("Mean Squared Error")
-    plt.savefig(IMAGES_DIR / f"qsvr_pca_powerlawweights_{powerlaw_exponent}_bloch_{qubit_exponent}.png")
+    plt.savefig(IMAGES_DIR / f"qsvr_pca_powerlawweights_NoRotation_{powerlaw_exponent}_bloch_{qubit_exponent}.png")
     plt.close()
+
+
+RESULTS_CSV = IMAGES_DIR / "QSVR_Powerlaw_Bloch_NoRotation_Results.csv"
+
+with RESULTS_CSV.open("w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow([
+        "Encoding",
+        "Data Exponent",
+        "Qubit Exponent",
+        "PCA Components",
+        "Physical Qubits",
+        "MSE",
+        "R2"
+    ])
 
 data_exponents = [0.5, 1.0, 1.5, 2.0, 3.0]
 qubit_exponents = [0.5, 1.0, 1.5, 2.0, 3.0]

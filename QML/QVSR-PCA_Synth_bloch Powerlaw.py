@@ -21,7 +21,7 @@ IMAGES_DIR.mkdir(exist_ok=True)
 
 data = fetch_california_housing(as_frame=True)
 
-data_path = Path(__file__).resolve().parent.parent / "ML" / "synthetic_powerlaw_dataset.npy"
+data_path = Path(__file__).resolve().parent.parent / "ML" / "synthetic_powerlaw3_dataset.npy"
 data = np.load(data_path)
 
 
@@ -65,7 +65,7 @@ def QSVR_PCA(model, target,k ):
     X_test  = scaler.transform(X_test)        # apply TRAIN's min/max to test
 
     PCA_weights = []
-    powerlaw_exponent = 1.5  # controls the decay of the eigenvalues
+    powerlaw_exponent = 2  # controls the decay of the eigenvalues
     for i in range(X_train.shape[1]):
         PCA_weights.append(round((X_train.shape[1] / (i + 1)) ** powerlaw_exponent))
 
@@ -104,7 +104,7 @@ def QSVR_PCA(model, target,k ):
 mse= []
 components = []
 R = []
-for g in range(2, 9):
+for g in range(2, 5):
     print("PCA with", g, "components")
     l = QSVR_PCA(X_std, y, g)
     R.append(l[1])
