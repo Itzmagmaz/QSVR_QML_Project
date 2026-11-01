@@ -9,7 +9,7 @@ from pathlib import Path
 IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images"
 IMAGES_DIR.mkdir(exist_ok=True)
 
-data = np.load(Path(__file__).resolve().parent / "synthetic_powerlaw_dataset.npy")
+data = np.load(Path(__file__).resolve().parent / "synthetic_powerlaw3_dataset.npy")
 X = data
 
 X_std = (X - X.mean()) / X.std() #Standardization / dont understant what its doing
@@ -111,7 +111,7 @@ for g in range(2,10):
 
 plt.figure()
 plt.plot(range(2,10), losses, marker='o')
-plt.title("Power-law Decay Synthetic Data: Classical MSE vs PCA components")
+plt.title("Power-law (3) Decay Synthetic Data: Classical MSE vs PCA components")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
 plt.savefig(IMAGES_DIR / "ML_POWERLAW_PCA_MSE.png")
