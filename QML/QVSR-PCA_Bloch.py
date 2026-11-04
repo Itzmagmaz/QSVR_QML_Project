@@ -13,9 +13,12 @@ import random
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from pathlib import Path
+import csv
 
-IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images"
+IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images" / "Bloch PCA Baseline"
 IMAGES_DIR.mkdir(exist_ok=True)
+
+RESULTS_CSV = IMAGES_DIR / "QSVR_Bloch_PCA_Baseline_Results.csv"
 
 #for some reason, sklearn is not installed in the classiq environment, so we have to install it manually
 
@@ -38,8 +41,8 @@ def Map(data: CArray[CReal], x: QArray[QBit]):
 # ML TIME
 y = data.target
 y2 = data2.target
-def QSVR_PCA(model, target,k ):
-    X_train, X_test, y_train, y_test = train_test_split(model, target, test_size=0.2, random_state=0) #split
+def QSVR_PCA(model, target, k, seed):
+    X_train, X_test, y_train, y_test = train_test_split(model, target, test_size=0.2, random_state=seed) #split
 
 
 
@@ -71,13 +74,17 @@ def QSVR_PCA(model, target,k ):
     PCA_weights = []
 
     for i in range(X_train.shape[1]):
-        PCA_weights.append(2 ** (X_train.shape[1] - i - 1))
+        PCA_weights.append(1)  # unweighted baseline: one copy of each PCA component
+        # PCA_weights.append(2 ** (X_train.shape[1] - i - 1))  # old 2^n weighting
 
     X_train =np.repeat(X_train, PCA_weights, axis=1)
     X_test =np.repeat(X_test, PCA_weights, axis=1)
 
-    X_train = np.pad(X_train, ((0,0),(0,1))) #DO NOT REMOVE THIS LINE, IT IS NECESSARY FOR THE QSVR TO WORK, OTHERWISE IT WILL THROW AN ERROR
-    X_test  = np.pad(X_test, ((0,0),(0,1)))
+    total_qubits = (X_train.shape[1] + 1) // 2
+
+    if X_train.shape[1] % 2: # Bloch needs an even number of features (2 per qubit)
+        X_train = np.pad(X_train, ((0,0),(0,1)))
+        X_test  = np.pad(X_test, ((0,0),(0,1)))
 
     #mini split due to hardware limitations
     X_train, y_train = X_train[:60], y_train[:60]
@@ -101,22 +108,54 @@ def QSVR_PCA(model, target,k ):
     print("K_train std :", K_train.std())
     print("K_train min :", K_train.min(), "max:", K_train.max())
 
-    return mean_squared_error(y_test, preds), r2_score(y_test, preds)
+    return mean_squared_error(y_test, preds), r2_score(y_test, preds), total_qubits
 
-mse= []
-components = []
-R = []
-for g in range(2, 9):
-    print("PCA with", g, "components")
-    l = QSVR_PCA(X_std, y, g)
-    R.append(l[1])
-    mse.append(l[0])
-    components.append(g)
+with RESULTS_CSV.open("w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow([
+        "Encoding",
+        "Seed",
+        "PCA Components",
+        "Physical Qubits",
+        "MSE",
+        "R2"
+    ])
 
-plt.figure()
-plt.plot( components,mse, marker='o')
-plt.title("Bloch encoding with weights : QSVR with PCA")
-plt.xlabel("Number of PCA components")
-plt.ylabel("Mean Squared Error")
-plt.savefig(IMAGES_DIR / "qsvr_pca_weights_bloch.png")
+for seed in range(5):
+    mse= []
+    components = []
+    R = []
+    for g in range(2, 9):
+        print("PCA with", g, "components")
+        l = QSVR_PCA(X_std, y, g, seed)
+        R.append(l[1])
+        mse.append(l[0])
+        components.append(g)
+
+        with RESULTS_CSV.open("a", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                "Bloch",
+                seed,
+                g,
+                l[2],
+                l[0],
+                l[1]
+            ])
+
+    plt.figure()
+    plt.plot( components,mse, marker='o')
+    plt.title(f"Bloch encoding unweighted : QSVR with PCA seed({seed})")
+    plt.xlabel("Number of PCA components")
+    plt.ylabel("Mean Squared Error")
+    plt.savefig(IMAGES_DIR / f"qsvr_pca_bloch_sweep_seed_{seed}.png")
+    plt.close()
+
+    plt.figure()
+    plt.plot( components,R, marker='o')
+    plt.title(f"Bloch encoding unweighted : QSVR PCA R^2 score seed({seed})")
+    plt.xlabel("Number of PCA components")
+    plt.ylabel("R^2 score")
+    plt.savefig(IMAGES_DIR / f"qsvr_pca_bloch_R2_seed_{seed}.png")
+    plt.close()
 

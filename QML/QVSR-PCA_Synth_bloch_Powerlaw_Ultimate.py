@@ -16,7 +16,7 @@ from pathlib import Path
 import csv
  # Set a random seed for reproducibility
 
-IMAGES_DIR = Path(__file__).resolve().parent.parent / "Powerlaw images"
+IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images" / "Powerlaw images"
 IMAGES_DIR.mkdir(exist_ok=True)
 
 #for some reason, sklearn is not installed in the classiq environment, so we have to install it manually

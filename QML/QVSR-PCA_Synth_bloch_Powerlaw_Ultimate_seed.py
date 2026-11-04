@@ -16,7 +16,7 @@ from pathlib import Path
 import csv
  # Set a random seed for reproducibility
 
-IMAGES_DIR = Path(__file__).resolve().parent.parent / "Powerlaw Seeds"
+IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images" / "Powerlaw Seeds"
 IMAGES_DIR.mkdir(exist_ok=True)
 
 #for some reason, sklearn is not installed in the classiq environment, so we have to install it manually
@@ -161,7 +161,7 @@ def Powerlaw_QSVR_PCA(powerlaw_exponent, qubit_exponent, static_seed):
 
     plt.figure()
     plt.plot( components,mse, marker='o')
-    plt.title(f"powerlaw weights({powerlaw_exponent})  No Rotation Synthetic data Bloch encoding with weights({qubit_exponent}) seed({static_seed}) : QSVR with PCA")
+    plt.title(f"powerlaw weights({powerlaw_exponent}) Synthetic data Bloch encoding\nwith weights({qubit_exponent}) seed({static_seed}) : QSVR with PCA", fontsize=10)
     plt.xlabel("Number of PCA components")
     plt.ylabel("Mean Squared Error")
     plt.savefig(IMAGES_DIR / f"qsvr_pca_powerlawweights_NoRotation_{powerlaw_exponent}_bloch_{qubit_exponent}_seed_{static_seed}.png")

@@ -13,9 +13,12 @@ import random
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from pathlib import Path
+import csv
 
-IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images"
+IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images" / "Quantum PCA Baseline"
 IMAGES_DIR.mkdir(exist_ok=True)
+
+RESULTS_CSV = IMAGES_DIR / "QSVR_PCA_Baseline_Results.csv"
 
 #for some reason, sklearn is not installed in the classiq environment, so we have to install it manually
 
@@ -34,8 +37,8 @@ X_std2 = (X2 - X2.mean()) / X2.std()
 # ML TIME
 y = data.target
 y2 = data2.target
-def QSVR_PCA(model, target, k):
-    X_train, X_test, y_train, y_test = train_test_split(model, target, test_size=0.2, random_state=0) #split
+def QSVR_PCA(model, target, k, seed):
+    X_train, X_test, y_train, y_test = train_test_split(model, target, test_size=0.2, random_state=seed) #split
 
 
 
@@ -93,30 +96,55 @@ def QSVR_PCA(model, target, k):
 
     return mean_squared_error(y_test, preds), r2_score(y_test, preds)
 
-mse= []
-components = []
-R = []
-for g in range(2, 9):
-    print("PCA with", g, "components")
-    l = QSVR_PCA(X_std, y, g)
-    R.append(l[1])
-    mse.append(l[0])
-    components.append(g)
+with RESULTS_CSV.open("w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow([
+        "Encoding",
+        "Seed",
+        "PCA Components",
+        "Physical Qubits",
+        "MSE",
+        "R2"
+    ])
 
-plt.figure()
-plt.plot( components,mse, marker='o')
-plt.title("QSVR with PCA")
-plt.xlabel("Number of PCA components")
-plt.ylabel("Mean Squared Error")
-plt.savefig(IMAGES_DIR / "qsvr_pca_sweep.png")
+for seed in range(5):
+    mse= []
+    components = []
+    R = []
+    for g in range(2, 9):
+        print("PCA with", g, "components")
+        l = QSVR_PCA(X_std, y, g, seed)
+        R.append(l[1])
+        mse.append(l[0])
+        components.append(g)
+
+        with RESULTS_CSV.open("a", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                "Pauli",
+                seed,
+                g,
+                g,      # one qubit per PCA component
+                l[0],
+                l[1]
+            ])
+
+    plt.figure()
+    plt.plot( components,mse, marker='o')
+    plt.title(f"QSVR with PCA seed({seed})")
+    plt.xlabel("Number of PCA components")
+    plt.ylabel("Mean Squared Error")
+    plt.savefig(IMAGES_DIR / f"qsvr_pca_sweep_seed_{seed}.png")
+    plt.close()
 
 
-plt.figure()
-plt.plot( components,R, marker='o')
-plt.title("QSVR PCA R^2 score")
-plt.xlabel("Number of PCA components")
-plt.ylabel("R^2 score")
-plt.savefig(IMAGES_DIR / "qsvr_pca_R2.png")
+    plt.figure()
+    plt.plot( components,R, marker='o')
+    plt.title(f"QSVR PCA R^2 score seed({seed})")
+    plt.xlabel("Number of PCA components")
+    plt.ylabel("R^2 score")
+    plt.savefig(IMAGES_DIR / f"qsvr_pca_R2_seed_{seed}.png")
+    plt.close()
 '''
 mse2= []
 components2 = []
