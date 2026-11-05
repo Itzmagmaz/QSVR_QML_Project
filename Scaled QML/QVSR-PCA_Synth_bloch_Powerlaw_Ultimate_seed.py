@@ -16,7 +16,7 @@ from pathlib import Path
 import csv
  # Set a random seed for reproducibility
 
-IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images" / "Scaled QML Images" / "Powerlaw Seeds"
+IMAGES_DIR = Path(__file__).resolve().parent / "Scaled QML Images" / "Powerlaw Seeds"
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 #for some reason, sklearn is not installed in the classiq environment, so we have to install it manually
@@ -134,7 +134,17 @@ def Powerlaw_QSVR_PCA(powerlaw_exponent, qubit_exponent, static_seed):
     # ML TIME
     y = X.sum(axis=1)
 
+    done = load_done()
+
     for g in range(2, 9):
+        if (static_seed, powerlaw_exponent, qubit_exponent, g) in done:
+            print(f"Already done: seed={static_seed}, data={powerlaw_exponent}, qubits={qubit_exponent}, k={g}")
+            row = done[(static_seed, powerlaw_exponent, qubit_exponent, g)]
+            mse.append(row[0])
+            R.append(row[1])
+            components.append(g)
+            continue
+
         print("PCA with", g, "components")
 
         l = QSVR_PCA(X_std, y, g, qubit_exponent)
@@ -170,21 +180,32 @@ def Powerlaw_QSVR_PCA(powerlaw_exponent, qubit_exponent, static_seed):
 
 RESULTS_CSV = IMAGES_DIR / "QSVR_Powerlaw_Bloch_NoRotation_Seeds_Results.csv"
 
-with RESULTS_CSV.open("w", newline="") as f:
-    writer = csv.writer(f)
-    writer.writerow([
-        "Encoding",
-        "Seed",
-        "Data Exponent",
-        "Qubit Exponent",
-        "PCA Components",
-        "Physical Qubits",
-        "MSE",
-        "R2"
-    ])
+def load_done():
+    # rows already in the CSV, so a restart picks up where it left off instead of starting over
+    done = {}
+    if RESULTS_CSV.exists():
+        with RESULTS_CSV.open(newline="") as f:
+            for row in csv.DictReader(f):
+                key = (int(row["Seed"]), float(row["Data Exponent"]), float(row["Qubit Exponent"]), int(row["PCA Components"]))
+                done[key] = (float(row["MSE"]), float(row["R2"]))
+    return done
+
+if not RESULTS_CSV.exists():  # only write the header once, never wipe old results
+    with RESULTS_CSV.open("w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "Encoding",
+            "Seed",
+            "Data Exponent",
+            "Qubit Exponent",
+            "PCA Components",
+            "Physical Qubits",
+            "MSE",
+            "R2"
+        ])
 
 data_exponents = [3.0]
-qubit_exponents = [1.0]
+qubit_exponents = [1.5]
 static_seed = [0,1,2,3,4]
 for seed in static_seed:
     for data_exp in data_exponents:

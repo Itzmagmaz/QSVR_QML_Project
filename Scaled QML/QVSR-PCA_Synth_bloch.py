@@ -14,7 +14,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 from pathlib import Path
 
-IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images" / "Scaled QML Images" / "Exponential Decay Bloch"
+IMAGES_DIR = Path(__file__).resolve().parent / "Scaled QML Images" / "Exponential Decay Bloch"
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 #for some reason, sklearn is not installed in the classiq environment, so we have to install it manually

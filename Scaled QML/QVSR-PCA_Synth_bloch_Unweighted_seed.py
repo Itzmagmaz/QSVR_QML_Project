@@ -15,7 +15,7 @@ from sklearn.metrics import r2_score
 from pathlib import Path
 import csv
 
-IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images" / "Scaled QML Images" / "Synth Bloch PCA Baseline"
+IMAGES_DIR = Path(__file__).resolve().parent / "Scaled QML Images" / "Synth Bloch PCA Baseline"
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 RESULTS_CSV = IMAGES_DIR / "QSVR_Synth_Bloch_PCA_Baseline_Results.csv"

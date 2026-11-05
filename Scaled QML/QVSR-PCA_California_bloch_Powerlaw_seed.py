@@ -12,7 +12,7 @@ from sklearn.metrics import r2_score
 from pathlib import Path
 import csv
 
-IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images" / "Scaled QML Images" / "California Bloch Powerlaw Seeds"
+IMAGES_DIR = Path(__file__).resolve().parent / "Scaled QML Images" / "California Bloch Powerlaw Seeds"
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 RESULTS_CSV = IMAGES_DIR / "QSVR_California_Bloch_Powerlaw_Seeds_Results.csv"
@@ -118,7 +118,7 @@ with RESULTS_CSV.open("w", newline="") as f:
         "R2"
     ])
 
-qubit_exponents = [1.0]
+qubit_exponents = [1.5]
 
 for seed in range(5):
     for qubit_exp in qubit_exponents:

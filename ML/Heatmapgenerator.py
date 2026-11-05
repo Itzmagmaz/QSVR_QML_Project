@@ -12,7 +12,7 @@ from pathlib import Path
 import csv
 
 
-IMAGES_DIR = Path(__file__).resolve().parent.parent / "Images" / "Powerlaw images"
+IMAGES_DIR = Path(__file__).resolve().parent.parent / "Scaled QML" / "Scaled QML Images" / "Powerlaw images"
 IMAGES_DIR.mkdir(exist_ok=True)
 
 RESULTS_CSV = IMAGES_DIR / "QSVR_Powerlaw_Bloch_NoRotation_Results.csv"
@@ -40,7 +40,7 @@ plt.xticks(range(len(qubit_exponents)), qubit_exponents)
 plt.yticks(range(len(data_exponents)), data_exponents)
 plt.xlabel("Qubit Exponent")
 plt.ylabel("Data Exponent")
-plt.title("Bloch powerlaw: lowest MSE per combination")
+plt.title("Bloch powerlaw weighting: lowest MSE per combination")
 
 middle = (np.nanmin(grid) + np.nanmax(grid)) / 2
 for (d, q), (mse, k) in best.items():

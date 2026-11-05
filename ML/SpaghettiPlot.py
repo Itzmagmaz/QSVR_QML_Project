@@ -59,25 +59,24 @@ RESULTS_CSV = FOLDER / "QSVR_Powerlaw_Bloch_NoRotation_Seeds_Scaled_Results.csv"
 
 makegraph(RESULTS_CSV, FOLDER, "weighted(1.0)", "Synthetic dataset power law(3.0)")
 """
-SCALED = ROOT / "Images" / "Scaled QML Images"
-
+SCALED = ROOT / "Scaled QML" / "Scaled QML Images"
+"""
 FOLDER = SCALED / "Bloch PCA Baseline"
 RESULTS_CSV = FOLDER / "QSVR_Bloch_PCA_Baseline_Results.csv"
 
 makegraph(RESULTS_CSV, FOLDER, "unweighted", "California Housing Dataset")
-"""
+
 FOLDER = SCALED / "California Bloch Powerlaw Seeds"
 RESULTS_CSV = FOLDER / "QSVR_California_Bloch_Powerlaw_Seeds_Results.csv"
 
-makegraph(RESULTS_CSV, FOLDER, "weighted(1.0) ", "California Housing Dataset")
+makegraph(RESULTS_CSV, FOLDER, "weighted(1.5) ", "California Housing Dataset")
 
 FOLDER = SCALED / "Synth Bloch PCA Baseline"
 RESULTS_CSV = FOLDER / "QSVR_Synth_Bloch_PCA_Baseline_Results.csv"
 
 makegraph(RESULTS_CSV, FOLDER, "unweighted ", "Synthetic dataset power law(3.0)")
-
+"""
 FOLDER = SCALED / "Powerlaw Seeds"
 RESULTS_CSV = FOLDER / "QSVR_Powerlaw_Bloch_NoRotation_Seeds_Results.csv"
 
-makegraph(RESULTS_CSV, FOLDER, "weighted(1.0)", "Synthetic dataset power law(3.0)")
-"""
+makegraph(RESULTS_CSV, FOLDER, "weighted(1.5)", "Synthetic dataset power law(3.0)")
