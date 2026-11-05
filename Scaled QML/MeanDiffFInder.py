@@ -9,11 +9,11 @@ u = pd.read_csv(IMAGES_DIR / "Synth Bloch PCA Baseline" / "QSVR_Synth_Bloch_PCA_
 """
 w = pd.read_csv(IMAGES_DIR / "California Bloch Powerlaw Seeds" / "QSVR_California_Bloch_Powerlaw_Seeds_Results.csv")
 u = pd.read_csv(IMAGES_DIR / "Bloch PCA Baseline" / "QSVR_Bloch_PCA_Baseline_Results.csv")
-w_seed = w.groupby("Seed")["MSE"].mean()
-u_seed = u.groupby("Seed")["MSE"].mean()
+weighted_mean= w.groupby("Seed")["MSE"].mean()
+unweighted_mean = u.groupby("Seed")["MSE"].mean()
 
-pct = (u_seed.mean() - w_seed.mean()) / u_seed.mean() * 100
+pchange= (unweighted_mean.mean() - weighted_mean.mean()) / unweighted_mean.mean() * 100
 
-p = stats.ttest_rel(w_seed, u_seed).pvalue
-print(f"weighted mean MSE = {w_seed.mean():.3f}, unweighted mean MSE = {u_seed.mean():.3f}")
-print(f"{pct:.1f}% lower, p = {p:.3f}")
+pval = stats.ttest_rel(weighted_mean, unweighted_mean).pvalue
+print(f"weighted mean MSE = {weighted_mean.mean():.3f}, unweighted mean MSE = {unweighted_mean.mean():.3f}")
+print(f"{pchange:.1f}% lower, p = {pval:.3f}")

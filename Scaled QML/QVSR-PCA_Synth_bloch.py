@@ -111,7 +111,7 @@ for g in range(2, 6):
 
 plt.figure()
 plt.plot( components,mse, marker='o')
-plt.title("exponential decay Synthetic data Bloch encoding with weights : QSVR with PCA")
+plt.title("Exponential decay Synthetic data Bloch encoding\n with weights : QSVR with PCA")
 plt.xlabel("Number of PCA components")
 plt.ylabel("Mean Squared Error")
 plt.savefig(IMAGES_DIR / "qsvr_pca_weights_bloch.png")
